@@ -1,0 +1,44 @@
+<html>
+  <head>
+    <title>Cursor Tracker Replay</title>
+    <style type="text/css">
+      #cursor {
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        border-radius: 10px;
+        background-color: blue;        
+        width: 6px;
+        height: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cursor"></div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
+    <script type="text/javascript">
+      (function() {
+        const socket = io("http://localhost:8888");
+
+        const cursor = document.getElementById("cursor");
+        
+        socket
+          .on("connect", function() {
+            console.info("connected");
+          })
+          .on("cursor-replay", function(data) {
+            cursor.style.left = data.x - 3;
+            cursor.style.top = data.y - 3;
+          });
+
+        document.onmousemove = handleMouseMove;
+        function handleMouseMove(event) {
+          socket.emit("cursor-tracker", {
+            x: event.pageX,
+            y: event.pageY
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
